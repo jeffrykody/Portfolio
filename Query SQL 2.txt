@@ -1,0 +1,311 @@
+1.	Menampilkan informasi Berapa jumlah dosen yang mengajar jam 5 sore ? 
+MariaDB [akademikibtpi]> select count(*) as 'Jumlah dosen mengajar jam 5 sore'
+    -> from jadwal where waktu='17:00:00';
++----------------------------------+
+| Jumlah dosen mengajar jam 5 sore |
++----------------------------------+
+|                                3 |
++----------------------------------+
+1 row in set (0.001 sec)
+
+2.	Apa nama matakuliah dan siapa nama dosennya ? (dari soal no 1)
+MariaDB [akademikibtpi]> select matakuliah.nmmk as 'Nama matakuliah',
+    -> dosen.nm_dsn as 'Nama dosen'
+    -> from jadwal
+    -> join matakuliah on matakuliah.kdmk=jadwal.kdmk
+    -> join dosen on dosen.nip=jadwal.nip
+    -> where waktu='17:00:00';
++-----------------+-----------------------------+
+| Nama matakuliah | Nama dosen                  |
++-----------------+-----------------------------+
+| Kewarganegaraan | Harry Supriadi, S.E, M.M    |
+| Bahasa Inggris  | Gumilang Atma, S.E, M.M     |
+| Aljabar Linear  | Jupiter Sukriyani, S.E, M.M |
++-----------------+-----------------------------+
+3 rows in set (0.001 sec)
+
+3.	Kelas apa saja yang belajar jam 5 sore tersebut ? 
+MariaDB [akademikibtpi]> select jadwal.nm_kelas as 'Nama kelas jam 5 sore'
+    -> from jadwal
+    -> where waktu='17:00:00';
++-----------------------+
+| Nama kelas jam 5 sore |
++-----------------------+
+| S1-SI                 |
+| S1-SI                 |
+| D3-AK                 |
++-----------------------+
+3 rows in set (0.001 sec)
+
+4.	Coba tampilkan nama-nama dosen, nama matakuliah dan kelas selain jam 5 sore
+MariaDB [akademikibtpi]> select matakuliah.nmmk as 'Nama matakuliah',
+    -> dosen.nm_dsn as 'Nama dosen',
+    -> jadwal.nm_kelas as 'Nama kelas'
+    -> from jadwal
+    -> join matakuliah on matakuliah.kdmk=jadwal.kdmk
+    -> join dosen on dosen.nip=jadwal.nip
+    -> where not jadwal.waktu='17:00:00';
++-----------------+--------------------------+------------+
+| Nama matakuliah | Nama dosen               | Nama kelas |
++-----------------+--------------------------+------------+
+| Kewarganegaraan | Asri S.Kom               | S1-TI      |
+| Bahasa Inggris  | Harry Supriadi, S.E, M.M | S1-TI      |
+| Kewarganegaraan | Harry Supriadi, S.E, M.M | S2-TI      |
+| Kewarganegaraan | Harry Supriadi, S.E, M.M | S3-TI      |
+| Kewarganegaraan | Harry Supriadi, S.E, M.M | S2-SI      |
+| Bahasa Inggris  | Gumilang Atma, S.E, M.M  | S2-TI      |
+| Bahasa Inggris  | Gumilang Atma, S.E, M.M  | S3-TI      |
++-----------------+--------------------------+------------+
+7 rows in set (0.001 sec)
+
+5.	Tampilkan nama-nama kelas dari Prodi TI dan SI 
+MariaDB [akademikibtpi]> select nm_kelas as 'Nama kelas',
+    -> nm_prodi as 'Nama prodi'
+    -> from kelas
+    -> where nm_prodi like '%TI%' or nm_prodi like '%SI%'
+    -> order by nm_prodi asc;
++------------+------------+
+| Nama kelas | Nama prodi |
++------------+------------+
+| S1-SI      | S1SI       |
+| S2-SI      | S1SI       |
+| S3-SI      | S1SI       |
+| S1-TI      | S1TI       |
+| S2-TI      | S1TI       |
+| S3-TI      | S1TI       |
++------------+------------+
+6 rows in set (0.001 sec)
+
+6.	Berapa jumlah kelas TI dan SI ?
+MariaDB [akademikibtpi]> select count(*) as 'Jumlah' from kelas
+    -> where nm_prodi like '%SI%' or nm_prodi like '%TI%';
++--------+
+| Jumlah |
++--------+
+|      6 |
++--------+
+1 row in set (0.001 sec)
+
+7.	Berapa jumlah mahasiswa TI dan SI ?
+MariaDB [akademikibtpi]> select count(*) as 'Jumlah' from mahasiswa
+    -> where nm_prodi like '%SI%' or nm_prodi like '%TI%';
++--------+
+| Jumlah |
++--------+
+|     10 |
++--------+
+1 row in set (0.001 sec)
+
+8.	Berasal dari kota mana saja mahasiswa TI dan SI tersebut?
+MariaDB [akademikibtpi]> select kota as 'Kota',
+    -> nm_prodi as 'Nama prodi'
+    -> from mahasiswa
+    -> where nm_prodi like '%TI%' or nm_prodi like '%SI%'
+    -> order by nm_prodi asc;
++------------+------------+
+| Kota       | Nama prodi |
++------------+------------+
+| Duri       | D3SI       |
+| Duri       | D3SI       |
+| Duri       | S1SI       |
+| Pekanbaru  | S1SI       |
+| Bangkinang | S1TI       |
+| Pekanbaru  | S1TI       |
+| Pekanbaru  | S1TI       |
+| Pekanbaru  | S1TI       |
+| Pekanbaru  | S1TI       |
+| Bangkinang | S1TI       |
++------------+------------+
+10 rows in set (0.001 sec)
+
+9.	Siapakah mahasiswa ( nim, nama mhs, nama matkuliah ) yang mendapatkan nilai terendah dari dosen A? ( ambil salah satu nama dosen)
+MariaDB [akademikibtpi]> select min(nilai.nuas),
+    -> mahasiswa.nama,
+    -> matakuliah.nmmk
+    -> from nilai
+    -> join mahasiswa on nilai.nim=mahasiswa.nim
+    -> join matakuliah on matakuliah.kdmk=nilai.kdmk
+    -> join dosen on dosen.nip=matakuliah.nip
+    -> where dosen.nm_dsn='Gumilang Atma, S.E, M.M';
++------------------+--------+----------------+
+| max(nilai.nuas)  | nama   | nmmk           |
++------------------+--------+----------------+
+|              70  |   ANDI | Bahasa Inggris |
++------------------+--------+----------------+
+1 row in set (0.001 sec)
+
+10.	Siapakah mahasiswa ( nim, nama mhs, nama matkuliah ) yang mendapatkan nilai tertinggi dari dosen selain A? ( dari soal no 9)
+MariaDB [akademikibtpi]> select max(nilai.nuas),
+    -> mahasiswa.nama,
+    -> matakuliah.nmmk
+    -> from nilai
+    -> join mahasiswa on nilai.nim=mahasiswa.nim
+    -> join matakuliah on matakuliah.kdmk=nilai.kdmk
+    -> join dosen on dosen.nip=matakuliah.nip
+    -> where dosen.nm_dsn='Gumilang Atma, S.E, M.M';
++------------------+--------+----------------+
+| max(nilai.nuas)  | nama   | nmmk           |
++------------------+--------+----------------+
+|              100 | ANDIAN | Bahasa Inggris |
++------------------+--------+----------------+
+1 row in set (0.001 sec)
+
+11.	Berapa kelas dosen A mengajar ? ( dari soal no 9)
+MariaDB [akademikibtpi]> select count(jadwal.nm_kelas) as 'Jumlah kelas'
+    ->
+    -> from jadwal
+    -> join dosen on dosen.nip=jadwal.nip
+    -> where dosen.nm_dsn='Gumilang Atma, S.E, M.M';
++--------------+
+| Jumlah kelas |
++--------------+
+|            3 |
++--------------+
+1 row in set (0.001 sec)
+
+12.	Tampilkan ( nama matakuliah, sks, kelas waktu, jam ) dari dosen A
+MariaDB [akademikibtpi]> select matakuliah.nmmk as 'Nama matakuliah',
+    -> matakuliah.sks,
+    -> jadwal.nm_kelas as 'Kelas',
+    -> jadwal.waktu as 'Waktu'
+    -> from jadwal
+    -> join matakuliah on matakuliah.kdmk=jadwal.kdmk
+    -> join dosen on dosen.nip=jadwal.nip
+    -> where dosen.nm_dsn='Gumilang Atma, S.E, M.M';
++-----------------+------+-------+----------+
+| Nama matakuliah | sks  | Kelas | Waktu    |
++-----------------+------+-------+----------+
+| Bahasa Inggris  |    2 | S2-TI | 10:00:00 |
+| Bahasa Inggris  |    2 | S3-TI | 10:00:00 |
+| Bahasa Inggris  |    2 | S1-SI | 17:00:00 |
++-----------------+------+-------+----------+
+3 rows in set (0.001 sec)
+
+13.	Tampilkan nilai tugas, nilai uts, nilai uas semua mahasiswa yang belajar dengan dosen A
+MariaDB [akademikibtpi]> select nilai.nk as 'N. Tugas',
+    -> nilai.nuts as 'N. UTS',
+    -> nilai.nuas as 'N. UAS'
+    -> from nilai
+    -> join matakuliah on matakuliah.kdmk=nilai.kdmk
+    -> join dosen on matakuliah.nip=dosen.nip
+    -> where nm_dsn='Gumilang Atma, S.E, M.M';
++----------+--------+--------+
+| N. Tugas | N. UTS | N. UAS |
++----------+--------+--------+
+|       90 |    100 |    100 |
+|       80 |    100 |    100 |
++----------+--------+--------+
+2 rows in set (0.001 sec)
+
+14.	Berapakah nilai akhir dari semua mahasiswa yang mengambil matakuliah dengan dosen A?
+MariaDB [akademikibtpi]> select nilai.na
+    -> from nilai
+    -> join matakuliah on matakuliah.kdmk=nilai.kdmk
+    -> join dosen on matakuliah.nip=dosen.nip
+    -> where nm_dsn='Gumilang Atma, S.E, M.M';
++-------+
+| na    |
++-------+
+| 97.00 |
+| 94.00 |
++-------+
+2 rows in set (0.001 sec)
+
+15.	Berapa rata-rata matakuliah yang diambil oleh mahasiswa ?
+MariaDB [akademikibtpi]> select avg(*) from nilai
+    -> where nilai in (select count (*) from nilai group by nim);
++----------+
+|   avg(*) |
++----------+
+|        2 |
++----------+
+1 rows in set (0.001 sec)
+
+16.	Berapa IPK dari setiap mahasiswa ?
+MariaDB [akademikibtpi]> select mahasiswa.nama,
+    -> sum((matakuliah.sks*nilai.bobot)/(matakuliah.sks*4)) as 'IPK'
+    -> from nilai
+    -> join mahasiswa on mahasiswa.nim=nilai.nim
+    -> join matakuliah on matakuliah.kdmk=nilai.kdmk
+    -> group by mahasiswa.nama;
++----------+--------+
+| nama     | IPK    |
++----------+--------+
+| ADRIYATI | 0.5000 |
+| ALI      | 0.7500 |
+| ANDIAN   | 3.5000 |
+| ANDRIAN  | 1.0000 |
+| ANGGA    | 2.0000 |
+| ANGGI    | 0.7500 |
++----------+--------+
+6 rows in set (0.001 sec)
+
+17.	Tampilkan  jadwal dari mahasiswa yang bernama Ani ( Ani nama contoh boleh yang lain ) 
+MariaDB [akademikibtpi]> select matakuliah.nmmk,
+    -> jadwal.waktu
+    -> from jadwal
+    -> join matakuliah on matakuliah.kdmk=jadwal.kdmk
+    -> join nilai on nilai.kdmk=matakuliah.kdmk
+    -> join mahasiswa on mahasiswa.nim=nilai.nim
+    -> where mahasiswa.nama='ANDIAN';
++-----------------+----------+
+| nmmk            | waktu    |
++-----------------+----------+
+| Kewarganegaraan | 08:00:00 |
+| Bahasa Inggris  | 10:00:00 |
+| Kewarganegaraan | 08:00:00 |
+| Kewarganegaraan | 08:00:00 |
+| Kewarganegaraan | 17:00:00 |
+| Kewarganegaraan | 08:00:00 |
+| Bahasa Inggris  | 10:00:00 |
+| Bahasa Inggris  | 10:00:00 |
+| Bahasa Inggris  | 17:00:00 |
+| Aljabar Linear  | 17:00:00 |
++-----------------+----------+
+10 rows in set (0.001 sec)
+
+18.	Berapa jumlah sks ani ?
+MariaDB [akademikibtpi]> select sum(matakuliah.sks) as 'Jumlah'
+    -> from nilai
+    -> join mahasiswa on mahasiswa.nim=nilai.nim
+    -> join matakuliah on matakuliah.kdmk=nilai.kdmk
+    -> where mahasiswa.nama='ANDIAN';
++--------+
+| Jumlah |
++--------+
+|      9 |
++--------+
+1 row in set (0.001 sec)
+
+19.	Berapa rata-rata sks yang diambil oleh setiap mahasiswa di kelas ani? 
+MariaDB [akademikibtpi]> select mahasiswa.nama,
+    -> avg(matakuliah.sks) as 'Rata rata'
+    -> from nilai
+    -> join mahasiswa on mahasiswa.nim=nilai.nim
+    -> join matakuliah on matakuliah.kdmk=nilai.kdmk
+    -> group by mahasiswa.nama;
++----------+-----------+
+| nama     | Rata rata |
++----------+-----------+
+| ADRIYATI |    3.0000 |
+| ALI      |    3.0000 |
+| ANDIAN   |    2.2500 |
+| ANDRIAN  |    3.0000 |
+| ANGGA    |    2.5000 |
+| ANGGI    |    3.0000 |
++----------+-----------+
+6 rows in set (0.001 sec)
+
+20.	Berapa nilai tertinggi ani dan matakuliah apa ? 
+MariaDB [akademikibtpi]> select max(nilai.nuas) as 'Nilai tertinggi',
+    -> matakuliah.nmmk as 'Nama matakuliah'
+    -> from nilai
+    -> join mahasiswa on mahasiswa.nim=nilai.nim
+    -> join matakuliah on matakuliah.kdmk=nilai.kdmk
+    -> where mahasiswa.nama='ANDIAN';
++-----------------+-----------------+
+| Nilai tertinggi | Nama matakuliah |
++-----------------+-----------------+
+|             100 |  Bahasa Inggris |
++-----------------+-----------------+
+1 row in set (0.001 sec)

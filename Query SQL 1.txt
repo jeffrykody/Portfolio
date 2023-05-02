@@ -1,0 +1,113 @@
+Mengubah data field nilai akhir dengan ketentuan nilai akhir=30% dari nilai kuis,35% dari nilai uts dan 35% dari nilai uas
+------------------------------------------------------------------------
+MariaDB [akademikibtpi]> update nilai set na=0.3*nk+0.35*nuts+0.35*nuas;
+Query OK, 10 rows affected (0.005 sec)
+Rows matched: 10  Changed: 10  Warnings: 0
+
+MariaDB [akademikibtpi]> select *from nilai;
++---------------+----------+------+------+------+-------+
+| nim           | kdmk     | nk   | nuts | nuas | na    |
++---------------+----------+------+------+------+-------+
+| 2010101001001 | KB-00001 |   70 |   90 |   80 | 80.50 |
+| 2010101001001 | KB-00002 |   70 |   90 |   80 | 80.50 |
+| 2010101002001 | KB-00001 |   60 |   70 |   90 | 74.00 |
+| 2010101011001 | KB-00001 |   80 |   80 |   70 | 76.50 |
+| 2010101011001 | KB-00002 |   80 |   80 |   70 | 76.50 |
+| 2010101012001 | KB-00001 |   90 |   60 |   60 | 69.00 |
+| 2010101001001 | KB-00003 |   70 |   90 |   80 | 80.50 |
+| 2010101001001 | PK-00001 |   70 |   90 |   80 | 80.50 |
+| 2010101001001 | PK-00001 |   80 |   90 |   70 | 80.00 |
+| 2010101001001 | KB-00003 |   89 |   97 |   88 | 91.45 |
++---------------+----------+------+------+------+-------+
+10 rows in set (0.00 sec)
+
+10 Informasi menggunakan sum,max,min dan lainnya
+------------------------------------------------
+1. Tampilkan nilai rata rata field nk dari tabel nilai.
+MariaDB [akademikibtpi]> select avg(nk) as 'Rata-rata' from nilai;
++-----------+
+| Rata-rata |
++-----------+
+|   75.9000 |
++-----------+
+1 row in set (0.001 sec)
+
+2. Tampilkan nilai rata rata field nuts dengan presisi 2 angka dibelakang koma dari tabel nilai.
+MariaDB [akademikibtpi]> select round(avg(nuts),2) as 'Rata-rata' from nilai;
++-----------+
+| Rata-rata |
++-----------+
+|     83.70 |
+1 row in set (0.001 sec)
+
+3. Tampilkan rata rata field nk,nuts dan nuas dengan presisi 2 angka dibelakang koma dari tabel nilai.
+MariaDB [akademikibtpi]> select round(avg(nk),2) as 'Rata-rata NK',round(avg(nuts),2) as 'Rata-rata NUTS',round(avg(nuas),2) as 'Rata-rata NUAS' from nilai;
++--------------+----------------+----------------+
+| Rata-rata NK | Rata-rata NUTS | Rata-rata NUAS |
++--------------+----------------+----------------+
+|        75.90 |          83.70 |          76.80 |
++--------------+----------------+----------------+
+1 row in set (0.00 sec)
+
+4. Tampilkan nilai tertinggi field na pada tabel nilai.
+MariaDB [akademikibtpi]> select max(na) as 'Nilai tertinggi' from nilai;
++-----------------+
+| Nilai tertinggi |
++-----------------+
+|           91.45 |
++-----------------+
+1 row in set (0.13 sec)
+
+5. Tampilkan nilai terendah field nk pada tabel nilai.
+MariaDB [akademikibtpi]> select min(nk) as 'Nilai terendah' from nilai;
++----------------+
+| Nilai terendah |
++----------------+
+|             60 |
++----------------+
+1 row in set (0.00 sec)
+
+6. Tampilkan field nim beserta nuas untuk nilai tertinggi untuk field nuas pada tabel nilai.
+MariaDB [akademikibtpi]> select nim,nuas as 'Nilai tertinggi' from nilai where nuas=(select max(nuas) from nilai);
++---------------+-----------------+
+| nim           | Nilai tertinggi |
++---------------+-----------------+
+| 2010101002001 |              90 |
++---------------+-----------------+
+1 row in set (0.00 sec)
+
+7. Tampilkan jumlah nilai field nk sebagai total nilai kuis pada tabel nilai.
+MariaDB [akademikibtpi]> select sum(nk) as 'Total nilai kuis' from nilai;
++------------------+
+| Total nilai kuis |
++------------------+
+|              759 |
++------------------+
+1 row in set (0.06 sec)
+
+8. Tampilkan jumlah nilai field na sebagai total nilai akhir pada tabel nilai.
+MariaDB [akademikibtpi]> select sum(na) as 'Total nilai akhir' from nilai;
++-------------------+
+| Total nilai akhir |
++-------------------+
+|            789.45 |
++-------------------+
+1 row in set (0.00 sec)
+
+9. Tampilkan nilai tertinggi field na sebagai nilai tertinggi NA dan terendah field na sebagai nilai terendah NA pada tabel nilai.
+MariaDB [akademikibtpi]> select max(na) as 'Nilai tertinggi NA', min(na) as 'Nilai Terendah NA' from nilai;
++--------------------+-------------------+
+| Nilai tertinggi NA | Nilai Terendah NA |
++--------------------+-------------------+
+|              91.45 |             69.00 |
++--------------------+-------------------+
+1 row in set (0.00 sec)
+
+10. Tampilkan rata rata, nilai tertinggi, nilai terendah, jumlah dari field nk pada tabel nilai.
+MariaDB [akademikibtpi]> select avg(nk) as 'Rata Rata NK', max(nk) as 'Nilai tertinggi NK', min(nk) as 'Nilai Terendah NK', sum(nk) as 'Jumlah Nilai NK' from nilai;
++--------------+--------------------+-------------------+-----------------+
+| Rata Rata NK | Nilai tertinggi NK | Nilai Terendah NK | Jumlah Nilai NK |
++--------------+--------------------+-------------------+-----------------+
+|      75.9000 |                 90 |                60 |             759 |
++--------------+--------------------+-------------------+-----------------+
+1 row in set (0.00 sec)
